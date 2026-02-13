@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Database imports
 from app.db.database import engine, Base
-from app.models.spec import Spec
 
 # Route imports
 from app.routes.generate import router as generate_router
@@ -22,10 +21,17 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 
-# Enable CORS (allows frontend to connect)
+# Allowed frontend origins
+origins = [
+    "http://localhost:5173",
+    "https://taskgeneratorai-cecqofcjc-priyansha-bedis-projects.vercel.app",
+]
+
+
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,  # allow your Vercel frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,7 +53,7 @@ def root():
     }
 
 
-# Optional health check endpoint
+# Health check endpoint
 @app.get("/health-check")
 def health_check():
     return {
