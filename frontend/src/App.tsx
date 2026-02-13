@@ -22,33 +22,40 @@ function App() {
 
     setLoading(true);
     setError("");
+    setResult("");
 
     try {
 
-      const response = await fetch("https://taskgenerator-punf.onrender.com/generate/", {
+      const response = await fetch(
+        "https://taskgenerator-punf.onrender.com/generate/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            goal,
+            users,
+            constraints,
+            app_type: appType,
+          }),
+        }
+      );
 
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          goal,
-          users,
-          constraints,
-          app_type: appType,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setResult(data.generated_spec);
-      } else {
-        setError("Generation failed");
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Backend error:", text);
+        setError("Backend error: " + text);
+        setLoading(false);
+        return;
       }
 
-    } catch {
-      setError("Backend connection error");
+      const data = await response.json();
+      setResult(data.generated_spec);
+
+    } catch (err) {
+      console.error("Connection error:", err);
+      setError("Connection failed. Backend may be waking up.");
     }
 
     setLoading(false);
@@ -61,17 +68,13 @@ function App() {
 
       {/* NAVBAR */}
       <div className="navbar">
-
         <div className="navbar-title">
           Tasks Generator
         </div>
-
         <StatusIndicator />
-
       </div>
 
-
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <div className="container">
 
         <div className="title">
@@ -82,14 +85,12 @@ function App() {
           Convert feature ideas into structured engineering tasks
         </div>
 
-
         <label>Goal *</label>
         <input
           className="input"
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
         />
-
 
         <label>Users *</label>
         <input
@@ -98,14 +99,12 @@ function App() {
           onChange={(e) => setUsers(e.target.value)}
         />
 
-
         <label>Constraints</label>
         <input
           className="input"
           value={constraints}
           onChange={(e) => setConstraints(e.target.value)}
         />
-
 
         <label>App Type</label>
         <select
@@ -119,34 +118,28 @@ function App() {
           <option value="internal">Internal Tool</option>
         </select>
 
-
         <button
           className="button"
           onClick={generateTasks}
+          disabled={loading}
         >
           {loading ? "Generating..." : "Generate Tasks"}
         </button>
 
-
         {error && (
-          <p style={{ color: "red" }}>{error}</p>
+          <p style={{ color: "red", marginTop: "10px" }}>
+            {error}
+          </p>
         )}
 
-
         {result && (
-
           <div>
-
             <h3>Generated Tasks</h3>
-
             <div className="result">
               {result}
             </div>
-
           </div>
-
         )}
-
 
         <RecentSpecs />
 
@@ -155,7 +148,6 @@ function App() {
     </div>
 
   );
-
 }
 
 export default App;
