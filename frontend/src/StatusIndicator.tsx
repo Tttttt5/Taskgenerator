@@ -9,7 +9,7 @@ function StatusIndicator() {
 
     try {
 
-      const res = await fetch("http://127.0.0.1:8000/health/");
+      const res = await fetch("https://taskgenerator-punf.onrender.com/health/");
 
       if (res.ok) {
         setStatus("Backend Online");

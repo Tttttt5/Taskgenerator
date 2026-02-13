@@ -14,7 +14,7 @@ function RecentSpecs() {
 
     try {
 
-      const response = await fetch("http://127.0.0.1:8000/specs/recent");
+      const response = await fetch("https://taskgenerator-punf.onrender.com/specs/recent");
 
       if (!response.ok) {
         throw new Error("Backend error");
